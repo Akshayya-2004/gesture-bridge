@@ -4,10 +4,12 @@ import GestureDisplay from "./components/GestureDisplay";
 
 const App = () => {
     return (
-        <div className="flex flex-col items-center min-h-screen bg-gray-900 text-white p-5">
-            <h1 className="text-3xl font-bold mb-4">Sign Language Detector 🖐️</h1>
-            <div className="w-full max-w-3xl space-y-4">
-                <CameraFeed />
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-5">
+            <h1 className="text-4xl font-bold mb-6 text-blue-400">🖐️ Sign Language Detector</h1>
+            <div className="w-full max-w-4xl flex flex-col space-y-6">
+                <div className="bg-gray-800 shadow-lg p-6 rounded-lg">
+                    <CameraFeed />
+                </div>
                 <GestureDisplay />
             </div>
         </div>
