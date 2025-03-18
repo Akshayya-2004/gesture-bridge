@@ -2,6 +2,7 @@ from flask import Flask, jsonify, Response
 import cv2
 import mediapipe as mp
 import numpy as np
+from flask import Flask, Response
 import atexit
 
 app = Flask(__name__)
@@ -15,24 +16,34 @@ cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 
 def classify_gesture(landmarks):
-    """
-    Classifies gestures based on hand landmark positions.
-    """
     thumb_tip = landmarks[4]
     index_tip = landmarks[8]
     middle_tip = landmarks[12]
     ring_tip = landmarks[16]
     pinky_tip = landmarks[20]
 
-    # Rule-based classification
-    if index_tip[1] < landmarks[6][1] and middle_tip[1] < landmarks[10][1]:
+    # VICTORY ✌️ (Index & Middle Finger Up, Others Down)
+    if index_tip[1] < landmarks[6][1] and middle_tip[1] < landmarks[10][1] and \
+       ring_tip[1] > landmarks[14][1] and pinky_tip[1] > landmarks[18][1]:
         return "Victory ✌️"
-    elif index_tip[1] < landmarks[6][1] and middle_tip[1] > landmarks[10][1]:
-        return "Index Finger Up ☝️"
-    elif all(landmarks[i][1] > landmarks[i-2][1] for i in [8, 12, 16, 20]):
-        return "Fist ✊"
-    elif thumb_tip[0] > landmarks[2][0] and all(landmarks[i][1] > landmarks[6][1] for i in [8, 12, 16, 20]):
+
+    # OPEN PALM 🖐️ (All Fingers Up)
+    elif all(landmarks[i][1] < landmarks[i - 2][1] for i in [8, 12, 16, 20]):
+        return "Open Palm 🖐️"
+
+    # THUMBS UP 👍
+    elif thumb_tip[0] > index_tip[0] and all(landmarks[i][1] > landmarks[6][1] for i in [8, 12, 16, 20]):
         return "Thumbs Up 👍"
+
+    # FIST ✊ (All Fingers Down)
+    elif all(landmarks[i][1] > landmarks[i - 2][1] for i in [8, 12, 16, 20]):
+        return "Fist ✊"
+
+    # OK 👌 (Thumb & Index Finger Form a Circle)
+    elif abs(thumb_tip[0] - index_tip[0]) < 0.02 and abs(thumb_tip[1] - index_tip[1]) < 0.02:
+        return "OK 👌"
+
+    # UNKNOWN GESTURE
     else:
         return "Unknown Gesture"
     
@@ -44,14 +55,25 @@ def video_feed():
             if not ret:
                 break
 
+            # Convert BGR to RGB for Mediapipe processing
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            result = hands.process(rgb_frame)
+
+            # Draw landmarks if hands are detected
+            if result.multi_hand_landmarks:
+                for hand_landmarks in result.multi_hand_landmarks:
+                    mp_drawing.draw_landmarks(
+                        frame, hand_landmarks, mp_hands.HAND_CONNECTIONS,
+                        mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=4),
+                        mp_drawing.DrawingSpec(color=(255, 0, 0), thickness=2, circle_radius=2)
+                    )
+
+            # Convert frame to JPEG format
             _, buffer = cv2.imencode('.jpg', frame)
             frame_bytes = buffer.tobytes()
-
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+            yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
 
     return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
 
 @app.route('/detect', methods=['GET'])
 def detect_hand():
