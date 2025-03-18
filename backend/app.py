@@ -1,3 +1,4 @@
+from flask_cors import CORS
 from flask import Flask, jsonify, Response
 import cv2
 import mediapipe as mp
@@ -6,6 +7,7 @@ from flask import Flask, Response
 import atexit
 
 app = Flask(__name__)
+CORS(app)
 
 # Initialize Mediapipe Hand Module
 mp_hands = mp.solutions.hands
