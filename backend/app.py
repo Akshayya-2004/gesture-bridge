@@ -28,7 +28,7 @@ def classify_gesture(landmarks):
     # ✅ OK Gesture 👌 (Thumb & Index Touching)
     thumb_index_distance = np.linalg.norm(thumb_tip - index_tip)
     if thumb_index_distance < 0.05 and middle_tip[1] > index_tip[1]:
-        return "OK 👌"
+        return "Saranghaeyo 🫰"
 
     # ✅ Thumbs Up 👍 (Thumb Up, Fingers Folded)
     if thumb_tip[1] < index_tip[1] and all(landmarks[i].y > landmarks[i - 2].y for i in [8, 12, 16, 20]):

@@ -14,7 +14,7 @@ const GestureDisplay = () => {
                 setGesture(data.gesture);
                 setGestureHistory(prevHistory => [data.gesture, ...prevHistory.slice(0, 4)]); // Keep last 5 gestures
             }
-        }, 1000);  // Fetch every second
+        }, 4000);  // Fetch every 4 seconds
 
         return () => clearInterval(interval);
     }, []);
