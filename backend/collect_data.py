@@ -24,7 +24,7 @@ cap = cv2.VideoCapture(0)
 # Initialize data storage
 data = []
 
-print("📸 Press 'S' to save a sample, 'Q' to quit.")
+print("📸 Press 'S' to save a sample, 'esc' to quit.")
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -52,7 +52,7 @@ while cap.isOpened():
             df.to_csv(csv_file, index=False, mode='a', header=not os.path.exists(csv_file))
             print(f"✅ Saved {len(data)} samples for '{gesture_name}'.")
             data.clear()
-    elif key == ord('q'):  # Quit
+    elif key == 27:  # Quit
         break
 
 cap.release()
