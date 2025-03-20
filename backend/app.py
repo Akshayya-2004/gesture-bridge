@@ -9,7 +9,7 @@ from flask_cors import CORS
 model = tf.keras.models.load_model("hand_gesture_model.h5")
 
 # Define Gesture Labels (Update based on your dataset)
-gesture_labels = ["thumbs_up", "victory", "ok", "open_palm", "fist", "call_me", "peace"]  
+gesture_labels = ["good_luck", "ok", "peace", "thank_you", "thumbs_up"]  
 
 # Initialize Flask App
 app = Flask(__name__)
@@ -82,11 +82,10 @@ def video_feed():
     return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 # Cleanup Function to Release Camera
-@app.before_first_request
-def setup():
-    """ Ensures the camera is released properly when the server stops. """
+with app.app_context():
     import atexit
     atexit.register(lambda: cap.release())
+
 
 if __name__ == "__main__":
     app.run(debug=True, threaded=True)
