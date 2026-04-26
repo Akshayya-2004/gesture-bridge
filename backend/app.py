@@ -17,7 +17,7 @@ cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
  
- # ✅ Function to Classify Gestures
+ # Function to Classify Gestures
 def classify_gesture(landmarks):
     thumb_tip = np.array([landmarks[4].x, landmarks[4].y])
     index_tip = np.array([landmarks[8].x, landmarks[8].y])
@@ -25,56 +25,56 @@ def classify_gesture(landmarks):
     ring_tip = np.array([landmarks[16].x, landmarks[16].y])
     pinky_tip = np.array([landmarks[20].x, landmarks[20].y])
  
-     # ✅ OK Gesture 👌 (Thumb & Index Touching)
+     # OK Gesture 👌 (Thumb & Index Touching)
     thumb_index_distance = np.linalg.norm(thumb_tip - index_tip)
     if thumb_index_distance < 0.05 and middle_tip[1] > index_tip[1]:
         return "Saranghaeyo 🫰"
  
-     # ✅ Thumbs Up 👍 (Thumb Up, Fingers Folded)
+     # Thumbs Up 👍 (Thumb Up, Fingers Folded)
     if thumb_tip[1] < index_tip[1] and all(landmarks[i].y > landmarks[i - 2].y for i in [8, 12, 16, 20]):
         return "Thumbs Up 👍"
  
-     # ✅ Thumbs Down 👎 (Thumb Down, Fingers Folded)
+     # Thumbs Down 👎 (Thumb Down, Fingers Folded)
     if thumb_tip[1] > index_tip[1] and all(landmarks[i].y > landmarks[i - 2].y for i in [8, 12, 16, 20]):
         return "Thumbs Down 👎"
  
-     # ✅ Victory ✌️ (Index & Middle Finger Up, Others Down)
+     # Victory ✌️ (Index & Middle Finger Up, Others Down)
     if index_tip[1] < landmarks[6].y and middle_tip[1] < landmarks[10].y and \
         ring_tip[1] > landmarks[14].y and pinky_tip[1] > landmarks[18].y:
             return "Victory ✌️"
  
-     # ✅ Open Palm 🖐️ (All Fingers Up)
+     # Open Palm 🖐️ (All Fingers Up)
     if all(landmarks[i].y < landmarks[i - 2].y for i in [8, 12, 16, 20]):
         return "Open Palm 🖐️"
  
-     # ✅ Fist ✊ (All Fingers Folded)
+     # Fist ✊ (All Fingers Folded)
     if all(landmarks[i].y > landmarks[i - 2].y for i in [8, 12, 16, 20]):
         return "Fist ✊"
  
-     # ✅ Pointing Up ☝️ (Only Index Finger Up)
+     # Pointing Up ☝️ (Only Index Finger Up)
     if index_tip[1] < landmarks[6].y and all(landmarks[i].y > landmarks[i - 2].y for i in [12, 16, 20]):
         return "Pointing Up ☝️"
  
-     # ✅ Pointing Left 👈 (Only Index Finger Extended Left)
+     # Pointing Left 👈 (Only Index Finger Extended Left)
     if index_tip[0] < thumb_tip[0] and all(landmarks[i].x > landmarks[i - 2].x for i in [12, 16, 20]):
         return "Pointing Left 👈"
  
-     # ✅ Pointing Right 👉 (Only Index Finger Extended Right)
+     # Pointing Right 👉 (Only Index Finger Extended Right)
     if index_tip[0] > thumb_tip[0] and all(landmarks[i].x < landmarks[i - 2].x for i in [12, 16, 20]):
         return "Pointing Right 👉"
  
-     # ✅ Rock Sign 🤘 (Index & Pinky Up, Others Down)
+     # Rock Sign 🤘 (Index & Pinky Up, Others Down)
     if index_tip[1] < landmarks[6].y and pinky_tip[1] < landmarks[18].y and middle_tip[1] > landmarks[10].y and ring_tip[1] > landmarks[14].y:
         return "Rock 🤘"
  
-     # ✅ Call Me Sign 🤙 (Thumb & Pinky Extended, Others Folded)
+     # Call Me Sign 🤙 (Thumb & Pinky Extended, Others Folded)
     if thumb_tip[0] < pinky_tip[0] and all(landmarks[i].y > landmarks[i - 2].y for i in [8, 12, 16]):
         return "Call Me 🤙"
  
-     # ❌ Unknown Gesture
+     # Unknown Gesture
     return "Unknown Gesture"
  
- # ✅ Flask API to Provide Gesture Data
+ # Flask API to Provide Gesture Data
 @app.route('/detect', methods=['GET'])
 def detect_hand():
     ret, frame = cap.read()
@@ -92,7 +92,7 @@ def detect_hand():
  
     return jsonify({"gesture": gesture})
  
- # ✅ Flask API to Provide Video Stream
+ # Flask API to Provide Video Stream
 @app.route('/video_feed')
 def video_feed():
     def generate():
